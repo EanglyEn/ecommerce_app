@@ -2,6 +2,7 @@
 
 import 'dart:ui';
 
+import 'package:ecommerce_app/screens/explore/explore_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -9,7 +10,6 @@ import 'providers/cart_provider.dart';
 import 'theme.dart';
 import 'screens/account/account_screen.dart';
 import 'screens/cart/cart_screen.dart';
-import 'screens/categories/categories_screen.dart';
 import 'screens/home/home_screen.dart';
 
 class MainShell extends ConsumerStatefulWidget {
@@ -36,7 +36,7 @@ class _MainShellState extends ConsumerState<MainShell> {
 
     final screens = [
       const HomeScreen(),
-      CategoriesScreen(onGoToHome: _goTo),
+      const ExploreScreen(),
       const CartScreen(),
       const AccountScreen(),
     ];
@@ -220,8 +220,8 @@ class _NavigationCapsule extends StatelessWidget {
                           ),
                           Expanded(
                             child: _FloatingNavItem(
-                              icon: Icons.grid_view_rounded,
-                              label: 'Categories',
+                              icon: Icons.explore_rounded,
+                              label: 'Explore',
                               selected: currentIndex == 1,
                               onTap: () => onTap(1),
                             ),

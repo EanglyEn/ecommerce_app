@@ -1,6 +1,7 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import '../../theme.dart';
-import '../common/app_back_button.dart';
 import 'account_profile_stat.dart';
 
 class AccountProfileHeader extends StatelessWidget {

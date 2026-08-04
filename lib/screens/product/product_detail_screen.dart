@@ -1,3 +1,5 @@
+// ignore_for_file: deprecated_member_use
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,6 +7,8 @@ import '../../models/product.dart';
 import '../../providers/cart_provider.dart';
 import '../../theme.dart';
 import '../../widgets/common/app_back_button.dart';
+import '../../widgets/common/app_dialog.dart';
+import '../../widgets/common/app_snack_bar.dart';
 
 class ProductDetailScreen extends ConsumerStatefulWidget {
   final Product product;
@@ -21,11 +25,19 @@ class ProductDetailScreen extends ConsumerStatefulWidget {
 
 class _ProductDetailScreenState
     extends ConsumerState<ProductDetailScreen> {
-  int _quantity = 1;
-
   @override
   Widget build(BuildContext context) {
     final product = widget.product;
+
+    final cartItems = ref.watch(cartProvider);
+
+    final existingItem = cartItems.cast<dynamic>().firstWhere(
+          (item) => item.product.id == product.id,
+          orElse: () => null,
+        );
+
+    final bool isInCart = existingItem != null;
+    final int quantity = existingItem?.quantity ?? 0;
 
     return Scaffold(
       backgroundColor: AppColors.bg,
@@ -100,7 +112,7 @@ class _ProductDetailScreenState
                         Container(
                           padding: const EdgeInsets.symmetric(
                             horizontal: 10,
-                            vertical: 10
+                            vertical: 10,
                           ),
                           decoration: BoxDecoration(
                             color: AppColors.brand.withOpacity(0.1),
@@ -145,7 +157,6 @@ class _ProductDetailScreenState
                     ),
 
                     const SizedBox(height: 10),
-
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
@@ -165,8 +176,7 @@ class _ProductDetailScreenState
                             '\$${product.price.toStringAsFixed(2)}',
                             style: AppText.body.copyWith(
                               fontSize: 15,
-                              decoration:
-                                  TextDecoration.lineThrough,
+                              decoration: TextDecoration.lineThrough,
                               color: AppColors.muted,
                             ),
                           ),
@@ -180,8 +190,7 @@ class _ProductDetailScreenState
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.brand,
-                              borderRadius:
-                                  BorderRadius.circular(8),
+                              borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
                               '-${product.discountPercent}%',
@@ -212,36 +221,44 @@ class _ProductDetailScreenState
                       style: AppText.body.copyWith(
                         fontSize: 14,
                         color: AppColors.ink.withOpacity(0.7),
+                        height: 1.5,
                       ),
                     ),
 
-                    const SizedBox(height: 22),
+                    const SizedBox(height: 28),
                     Row(
                       children: [
-                        Text(
-                          'QUANTITY',
-                          style: AppText.label.copyWith(
-                            fontSize: 11,
-                            letterSpacing: 0.5,
-                          ),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              'QUANTITY',
+                              style: AppText.label.copyWith(
+                                fontSize: 11,
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+
+                            const SizedBox(height: 3),
+
+                            Text(
+                              isInCart
+                                  ? 'In your cart'
+                                  : 'Choose quantity',
+                              style: AppText.body.copyWith(
+                                color: AppColors.muted,
+                                fontSize: 10.5,
+                              ),
+                            ),
+                          ],
                         ),
 
                         const Spacer(),
 
                         QuantityStepper(
-                          quantity: _quantity,
-                          onDecrement: () {
-                            if (_quantity > 1) {
-                              setState(() {
-                                _quantity--;
-                              });
-                            }
-                          },
-                          onIncrement: () {
-                            setState(() {
-                              _quantity++;
-                            });
-                          },
+                          quantity: quantity,
+                          onDecrement: () => _decreaseQuantity(quantity),
+                          onIncrement: () => _increaseQuantity(quantity),
                         ),
                       ],
                     ),
@@ -277,61 +294,73 @@ class _ProductDetailScreenState
             width: double.infinity,
             height: 54,
             child: ElevatedButton.icon(
-              icon: const Icon(
-                Icons.add_shopping_cart_rounded,
+              icon: Icon(
+                isInCart
+                    ? Icons.shopping_cart_rounded
+                    : Icons.add_shopping_cart_rounded,
                 size: 20,
               ),
-
-              onPressed: () {
-                ref
-                    .read(cartProvider.notifier)
-                    .addProduct(
-                      product,
-                      quantity: _quantity,
-                    );
-
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    behavior: SnackBarBehavior.floating,
-                    backgroundColor: AppColors.ink,
-                    margin: const EdgeInsets.fromLTRB(
-                      16,
-                      0,
-                      16,
-                      16,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    content: Row(
-                      children: [
-                        const Icon(
-                          Icons.check_circle_rounded,
-                          color: AppColors.success,
-                        ),
-                        const SizedBox(width: 10),
-                        Expanded(
-                          child: Text(
-                            '${product.name} added to cart',
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                );
-              },
-
+              onPressed: quantity == 0
+                  ? () => _increaseQuantity(0)
+                  : null,
               label: Text(
-                'Add to Cart · \$${(
-                  product.discountedPrice * _quantity
-                ).toStringAsFixed(2)}',
+                quantity == 0
+                    ? 'Add to Cart'
+                    : isInCart
+                        ? 'In Cart · \$${(
+                            product.discountedPrice * quantity
+                          ).toStringAsFixed(2)}'
+                        : 'Add to Cart · \$${(
+                            product.discountedPrice * quantity
+                          ).toStringAsFixed(2)}',
               ),
             ),
           ),
         ),
       ),
+    );
+  }
+
+  void _increaseQuantity(int currentQuantity) {
+    final product = widget.product;
+
+    if (currentQuantity == 0) {
+      ref.read(cartProvider.notifier).addProduct(product);
+
+      AppSnackBar.success(
+        context,
+        '${product.name} added to cart',
+      );
+      return;
+    }
+
+    ref.read(cartProvider.notifier).incrementQuantity(product.id);
+  }
+
+  Future<void> _decreaseQuantity(int currentQuantity) async {
+    if (currentQuantity <= 0) return;
+
+    if (currentQuantity > 1) {
+      ref.read(cartProvider.notifier).decrementQuantity(widget.product.id);
+      return;
+    }
+
+    final shouldRemove = await AppDialog.showConfirm(
+      context,
+      title: 'Remove item?',
+      message:
+          'This is the last item in your cart. Do you want to remove "${widget.product.name}"?',
+      confirmText: 'Remove',
+      cancelText: 'Keep',
+    );
+
+    if (!shouldRemove || !mounted) return;
+
+    ref.read(cartProvider.notifier).removeProduct(widget.product.id);
+
+    AppSnackBar.success(
+      context,
+      'Item removed from your cart',
     );
   }
 }
@@ -368,6 +397,7 @@ class QuantityStepper extends StatelessWidget {
           QuantityStepButton(
             icon: Icons.remove_rounded,
             onTap: onDecrement,
+            enabled: quantity > 0,
           ),
 
           SizedBox(
@@ -392,23 +422,31 @@ class QuantityStepper extends StatelessWidget {
   }
 }
 
+// ===========================================================================
+// QUANTITY BUTTON
+// ===========================================================================
+
 class QuantityStepButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
+  final bool enabled;
 
   const QuantityStepButton({
     super.key,
     required this.icon,
     required this.onTap,
+    this.enabled = true,
   });
 
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: AppColors.brand,
+      color: enabled
+          ? AppColors.brand
+          : AppColors.line,
       shape: const CircleBorder(),
       child: InkWell(
-        onTap: onTap,
+        onTap: enabled ? onTap : null,
         customBorder: const CircleBorder(),
         child: SizedBox(
           width: 30,
@@ -416,7 +454,9 @@ class QuantityStepButton extends StatelessWidget {
           child: Icon(
             icon,
             size: 15,
-            color: Colors.white,
+            color: enabled
+                ? Colors.white
+                : AppColors.muted,
           ),
         ),
       ),
