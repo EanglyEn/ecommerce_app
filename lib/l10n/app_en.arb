@@ -1,0 +1,16 @@
+{
+  "settings": "Settings",
+  "notifications": "NOTIFICATIONS",
+  "pushNotifications": "Push notifications",
+  "emailNotifications": "Email notifications",
+  "appearance": "APPEARANCE",
+  "theme": "Theme",
+  "system": "System",
+  "light": "Light",
+  "dark": "Dark",
+  "language": "Language",
+  "chooseLanguage": "Choose language",
+  "account": "ACCOUNT",
+  "changePassword": "Change password",
+  "deleteAccount": "Delete account"
+}

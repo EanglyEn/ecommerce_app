@@ -40,14 +40,14 @@ class _ProductDetailScreenState
     final int quantity = existingItem?.quantity ?? 0;
 
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.of(context).bg,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
           SliverAppBar(
             pinned: true,
             expandedHeight: 340,
-            backgroundColor: AppColors.bg,
+            backgroundColor: AppColors.of(context).bg,
             elevation: 0,
             surfaceTintColor: Colors.transparent,
             leading: const Padding(
@@ -64,7 +64,7 @@ class _ProductDetailScreenState
                 child: Hero(
                   tag: 'product-image-${product.id}',
                   child: Container(
-                    color: AppColors.surface,
+                    color: AppColors.of(context).surface,
                     child: Image.network(
                       product.imageUrl,
                       fit: BoxFit.cover,
@@ -73,11 +73,11 @@ class _ProductDetailScreenState
                         error,
                         stackTrace,
                       ) {
-                        return const Center(
+                        return Center(
                           child: Icon(
                             Icons.image_not_supported_outlined,
                             size: 50,
-                            color: AppColors.muted,
+                            color: AppColors.of(context).muted,
                           ),
                         );
                       },
@@ -91,9 +91,9 @@ class _ProductDetailScreenState
             child: Transform.translate(
               offset: const Offset(0, -8),
               child: Container(
-                decoration: const BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.only(
+                decoration: BoxDecoration(
+                  color: AppColors.of(context).surface,
+                  borderRadius: const BorderRadius.only(
                     topLeft: Radius.circular(28),
                     topRight: Radius.circular(28),
                   ),
@@ -177,7 +177,7 @@ class _ProductDetailScreenState
                             style: AppText.body.copyWith(
                               fontSize: 15,
                               decoration: TextDecoration.lineThrough,
-                              color: AppColors.muted,
+                              color: AppColors.of(context).muted,
                             ),
                           ),
 
@@ -220,7 +220,7 @@ class _ProductDetailScreenState
                       product.description,
                       style: AppText.body.copyWith(
                         fontSize: 14,
-                        color: AppColors.ink.withOpacity(0.7),
+                        color: AppColors.of(context).ink.withOpacity(0.7),
                         height: 1.5,
                       ),
                     ),
@@ -246,7 +246,7 @@ class _ProductDetailScreenState
                                   ? 'In your cart'
                                   : 'Choose quantity',
                               style: AppText.body.copyWith(
-                                color: AppColors.muted,
+                                color: AppColors.of(context).muted,
                                 fontSize: 10.5,
                               ),
                             ),
@@ -281,7 +281,7 @@ class _ProductDetailScreenState
             16,
           ),
           decoration: BoxDecoration(
-            color: AppColors.surface,
+            color: AppColors.of(context).surface,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withOpacity(0.06),
@@ -381,10 +381,10 @@ class QuantityStepper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.bg,
+        color: AppColors.of(context).bg,
         borderRadius: BorderRadius.circular(30),
         border: Border.all(
-          color: AppColors.line,
+          color: AppColors.of(context).line,
         ),
       ),
       padding: const EdgeInsets.symmetric(
@@ -422,10 +422,6 @@ class QuantityStepper extends StatelessWidget {
   }
 }
 
-// ===========================================================================
-// QUANTITY BUTTON
-// ===========================================================================
-
 class QuantityStepButton extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
@@ -443,7 +439,7 @@ class QuantityStepButton extends StatelessWidget {
     return Material(
       color: enabled
           ? AppColors.brand
-          : AppColors.line,
+          : AppColors.of(context).line,
       shape: const CircleBorder(),
       child: InkWell(
         onTap: enabled ? onTap : null,
@@ -456,7 +452,7 @@ class QuantityStepButton extends StatelessWidget {
             size: 15,
             color: enabled
                 ? Colors.white
-                : AppColors.muted,
+                : AppColors.of(context).muted,
           ),
         ),
       ),

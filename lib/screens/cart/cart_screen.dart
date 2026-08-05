@@ -17,10 +17,10 @@ class CartScreen extends ConsumerWidget {
     final total = ref.watch(cartTotalProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.of(context).bg,
       appBar: AppBar(
         title: const Text('Your Cart'),
-        backgroundColor: AppColors.bg,
+        backgroundColor: AppColors.of(context).bg,
         surfaceTintColor: Colors.transparent,
         elevation: 0,
       ),
@@ -218,7 +218,7 @@ class _EmptyCart extends StatelessWidget {
               'and they will appear here.',
               textAlign: TextAlign.center,
               style: AppText.body.copyWith(
-                color: AppColors.muted,
+                color: AppColors.of(context).muted,
                 fontSize: 13,
                 height: 1.45,
               ),
@@ -248,7 +248,7 @@ class _CartHeader extends StatelessWidget {
         Text(
           '$itemCount ${itemCount == 1 ? 'item' : 'items'}',
           style: AppText.label.copyWith(
-            color: AppColors.muted,
+            color: AppColors.of(context).muted,
             fontSize: 12,
           ),
         ),
@@ -258,7 +258,7 @@ class _CartHeader extends StatelessWidget {
         Text(
           'Adjust quantity below',
           style: AppText.label.copyWith(
-            color: AppColors.muted,
+            color: AppColors.of(context).muted,
             fontSize: 10.5,
           ),
         ),
@@ -289,10 +289,10 @@ class _CartItemCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: AppColors.of(context).surface,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
-          color: AppColors.line.withOpacity(0.55),
+          color: AppColors.of(context).line.withOpacity(0.55),
         ),
         boxShadow: [
           BoxShadow(
@@ -314,15 +314,15 @@ class _CartItemCard extends StatelessWidget {
             child: Container(
               width: 82,
               height: 82,
-              color: AppColors.bg,
+              color: AppColors.of(context).bg,
               child: Image.network(
                 product.imageUrl,
                 fit: BoxFit.cover,
                 errorBuilder: (_, __, ___) {
-                  return const Center(
+                  return Center(
                     child: Icon(
                       Icons.image_not_supported_outlined,
-                      color: AppColors.muted,
+                      color: AppColors.of(context).muted,
                     ),
                   );
                 },
@@ -383,7 +383,7 @@ class _CartItemCard extends StatelessWidget {
                     Text(
                       'each',
                       style: AppText.body.copyWith(
-                        color: AppColors.muted,
+                        color: AppColors.of(context).muted,
                         fontSize: 10.5,
                       ),
                     ),
@@ -444,10 +444,10 @@ class _QuantityControl extends StatelessWidget {
     return Container(
       height: 34,
       decoration: BoxDecoration(
-        color: AppColors.bg,
+        color: AppColors.of(context).bg,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: AppColors.line,
+          color: AppColors.of(context).line,
         ),
       ),
       child: Row(
@@ -541,10 +541,10 @@ class _CheckoutBar extends StatelessWidget {
           16,
         ),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: AppColors.of(context).surface,
           border: Border(
             top: BorderSide(
-              color: AppColors.line.withOpacity(0.7),
+              color: AppColors.of(context).line.withOpacity(0.7),
             ),
           ),
           boxShadow: [
@@ -566,7 +566,7 @@ class _CheckoutBar extends StatelessWidget {
                     Text(
                       'Total',
                       style: AppText.label.copyWith(
-                        color: AppColors.muted,
+                        color: AppColors.of(context).muted,
                         fontSize: 11,
                       ),
                     ),
@@ -577,7 +577,7 @@ class _CheckoutBar extends StatelessWidget {
                       '$itemCount '
                       '${itemCount == 1 ? 'item' : 'items'}',
                       style: AppText.body.copyWith(
-                        color: AppColors.muted,
+                        color: AppColors.of(context).muted,
                         fontSize: 10.5,
                       ),
                     ),

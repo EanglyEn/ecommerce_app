@@ -2,13 +2,14 @@
 
 import 'dart:async';
 
+import 'package:ecommerce_app/widgets/skeleton_view/home_skeleton.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../providers/product_provider.dart';
 import '../../theme.dart';
 import '../../widgets/product_card.dart';
-import '../product/product_detail_screen.dart';
+import '../../app_router.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
   const HomeScreen({super.key});
@@ -23,6 +24,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   Timer? _promoTimer;
 
   int _currentPromo = 0;
+
+  bool _isLoading = true;
 
   final List<_PromoData> _promos = const [
     _PromoData(
@@ -51,11 +54,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   @override
   void initState() {
     super.initState();
+
     _promoController = PageController(
       viewportFraction: 0.94,
       initialPage: 1000,
     );
+
     _startPromoAutoScroll();
+    Future.delayed(const Duration(seconds: 5), () {
+      if (!mounted) return;
+
+      setState(() {
+        _isLoading = false;
+      });
+    });
   }
 
   void _startPromoAutoScroll() {
@@ -85,96 +97,115 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     });
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final products = ref.watch(filteredProductListProvider);
-    final categories = ref.watch(categoryListProvider);
-    final selectedCategory = ref.watch(selectedCategoryProvider);
+ @override
+Widget build(BuildContext context) {
+  final products = ref.watch(filteredProductListProvider);
+  final categories = ref.watch(categoryListProvider);
+  final selectedCategory =
+      ref.watch(selectedCategoryProvider);
 
-    return Scaffold(
-      backgroundColor: AppColors.bg,
-      body: SafeArea(
-        bottom: false,
-        child: CustomScrollView(
-          physics: const BouncingScrollPhysics(
-            parent: AlwaysScrollableScrollPhysics(),
-          ),
-          slivers: [
-            SliverToBoxAdapter(
-              child: _buildHeader(context),
-            ),
+  return Scaffold(
+    backgroundColor: AppColors.of(context).bg,
+    body: SafeArea(
+      bottom: false,
+      child: _isLoading
+          ? const HomeSkeleton()
+          : CustomScrollView(
+              physics: const BouncingScrollPhysics(
+                parent:
+                    AlwaysScrollableScrollPhysics(),
+              ),
+              slivers: [
+                SliverToBoxAdapter(
+                  child: _buildHeader(context),
+                ),
 
-            SliverToBoxAdapter(
-              child: _buildSearch(),
-            ),
+                SliverToBoxAdapter(
+                  child: _buildSearch(),
+                ),
 
-            SliverToBoxAdapter(
-              child: _buildPromoCarousel(),
-            ),
+                SliverToBoxAdapter(
+                  child: _buildPromoCarousel(),
+                ),
 
-            SliverToBoxAdapter(
-              child: _buildCategories(categories, selectedCategory),
-            ),
-
-            SliverToBoxAdapter(
-              child: _buildProductsHeader(selectedCategory),
-            ),
-            products.isEmpty
-                ? SliverFillRemaining(
-                    hasScrollBody: false,
-                    child: _buildEmptyState(),
-                  )
-                : SliverPadding(
-                    padding: const EdgeInsets.fromLTRB(
-                      16,
-                      0,
-                      16,
-                      30,
-                    ),
-                    sliver: SliverGrid(
-                      gridDelegate:
-                          const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        mainAxisSpacing: 16,
-                        crossAxisSpacing: 14,
-                        childAspectRatio: 0.60,
-                      ),
-                      delegate: SliverChildBuilderDelegate(
-                        (context, index) {
-                          final product = products[index];
-
-                          return _AnimatedProductItem(
-                            index: index,
-                            child: ProductCard(
-                              product: product,
-                              onTap: () {
-                                Navigator.of(context).push(
-                                  MaterialPageRoute(
-                                    builder: (_) => ProductDetailScreen(
-                                      product: product,
-                                    ),
-                                  ),
-                                );
-                              },
-                            ),
-                          );
-                        },
-                        childCount: products.length,
-                      ),
-                    ),
+                SliverToBoxAdapter(
+                  child: _buildCategories(
+                    categories,
+                    selectedCategory,
                   ),
-          ],
-        ),
-      ),
-    );
-  }
+                ),
+
+                SliverToBoxAdapter(
+                  child: _buildProductsHeader(
+                    selectedCategory,
+                  ),
+                ),
+
+                products.isEmpty
+                    ? SliverFillRemaining(
+                        hasScrollBody: false,
+                        child: _buildEmptyState(),
+                      )
+                    : SliverPadding(
+                        padding:
+                            const EdgeInsets.fromLTRB(
+                          16,
+                          0,
+                          16,
+                          30,
+                        ),
+                        sliver: SliverGrid(
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 16,
+                            crossAxisSpacing: 14,
+                            childAspectRatio: 0.60,
+                          ),
+                          delegate:
+                              SliverChildBuilderDelegate(
+                            (context, index) {
+                              final product =
+                                  products[index];
+
+                              return _AnimatedProductItem(
+                                index: index,
+                                child: ProductCard(
+                                  product: product,
+                                  onTap: () {
+                                    Navigator.of(
+                                      context,
+                                    ).pushNamed(
+                                      AppRoutes
+                                          .productDetail,
+                                      arguments:
+                                          product,
+                                    );
+                                  },
+                                ),
+                              );
+                            },
+                            childCount:
+                                products.length,
+                          ),
+                        ),
+                      ),
+              ],
+            ),
+    ),
+  );
+}
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+      padding: const EdgeInsets.fromLTRB(
+        16,
+        10,
+        16,
+        0,
+      ),
       child: Row(
         children: [
-          // Store avatar
           Container(
             width: 44,
             height: 44,
@@ -207,35 +238,45 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 Text(
                   'Deliver to',
                   style: AppText.label.copyWith(
-                    color: AppColors.muted,
+                    color:
+                        AppColors.of(context).muted,
                     fontSize: 11,
                   ),
                 ),
+
                 const SizedBox(height: 2),
+
                 Row(
                   children: [
                     Flexible(
                       child: Text(
                         'Phnom Penh, Cambodia',
                         maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
+                        overflow:
+                            TextOverflow.ellipsis,
                         style: AppText.body.copyWith(
-                          fontWeight: FontWeight.w700,
+                          fontWeight:
+                              FontWeight.w700,
                           fontSize: 13,
-                          color: AppColors.ink,
+                          color:
+                              AppColors.of(context).ink,
                         ),
                       ),
                     ),
+
                     const SizedBox(width: 3),
-                    const Icon(
+
+                    Icon(
                       Icons.keyboard_arrow_down_rounded,
                       size: 17,
-                      color: AppColors.ink,
+                      color:
+                          AppColors.of(context).ink,
                     ),
                   ],
                 ),
@@ -243,9 +284,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             ),
           ),
 
-          // Notification
           _HeaderIconButton(
-            icon: Icons.notifications_none_rounded,
+            icon:
+                Icons.notifications_none_rounded,
             onTap: () {},
             showBadge: true,
           ),
@@ -256,7 +297,12 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
   Widget _buildSearch() {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 20, 16, 0),
+      padding: const EdgeInsets.fromLTRB(
+        16,
+        20,
+        16,
+        0,
+      ),
       child: Container(
         height: 52,
         decoration: BoxDecoration(
@@ -274,20 +320,24 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ],
         ),
         child: TextField(
-          textInputAction: TextInputAction.search,
+          textInputAction:
+              TextInputAction.search,
           style: AppText.body.copyWith(
             fontSize: 14,
-            color: AppColors.ink,
+            color: AppColors.of(context).ink,
           ),
           decoration: InputDecoration(
-            hintText: 'Search products, brands or categories',
+            hintText:
+                'Search products, brands or categories',
             hintStyle: AppText.body.copyWith(
               fontSize: 13,
-              color: AppColors.muted,
+              color:
+                  AppColors.of(context).muted,
             ),
-            prefixIcon: const Icon(
+            prefixIcon: Icon(
               Icons.search_rounded,
-              color: AppColors.ink,
+              color:
+                  AppColors.of(context).ink,
               size: 22,
             ),
             suffixIcon: Padding(
@@ -296,8 +346,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 width: 36,
                 height: 36,
                 decoration: BoxDecoration(
-                  color: AppColors.brand.withOpacity(0.10),
-                  borderRadius: BorderRadius.circular(11),
+                  color: AppColors.brand
+                      .withOpacity(0.10),
+                  borderRadius:
+                      BorderRadius.circular(11),
                 ),
                 child: const Icon(
                   Icons.tune_rounded,
@@ -307,161 +359,262 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
               ),
             ),
             border: InputBorder.none,
-            contentPadding: const EdgeInsets.symmetric(
+            contentPadding:
+                const EdgeInsets.symmetric(
               horizontal: 8,
               vertical: 14,
             ),
           ),
           onChanged: (value) {
-            ref.read(searchQueryProvider.notifier).state = value;
+            ref
+                .read(searchQueryProvider.notifier)
+                .state = value;
           },
         ),
       ),
     );
   }
 
- Widget _buildPromoCarousel() {
-  return Column(
-    children: [
-      const SizedBox(height: 20),
+  // ---------------------------------------------------------------------------
+  // PROMO CAROUSEL
+  // ---------------------------------------------------------------------------
 
-      SizedBox(
-        height: 158,
-        child: PageView.builder(
-          controller: _promoController,
-          physics: const BouncingScrollPhysics(),
-          clipBehavior: Clip.none,
-          onPageChanged: _onPromoChanged,
-          itemBuilder: (context, index) {
-            final promo = _promos[index % _promos.length];
+  Widget _buildPromoCarousel() {
+    return Column(
+      children: [
+        const SizedBox(height: 20),
 
-            return AnimatedBuilder(
-              animation: _promoController,
-              builder: (context, child) {
-                double scale = 1.0;
+        SizedBox(
+          height: 158,
+          child: PageView.builder(
+            controller: _promoController,
+            physics:
+                const BouncingScrollPhysics(),
+            clipBehavior: Clip.none,
+            onPageChanged:
+                _onPromoChanged,
+            itemBuilder:
+                (context, index) {
+              final promo =
+                  _promos[index % _promos.length];
 
-                if (_promoController.hasClients &&
-                    _promoController.position.haveDimensions) {
-                  final page = _promoController.page ??
-                      _promoController.initialPage.toDouble();
+              return AnimatedBuilder(
+                animation:
+                    _promoController,
+                builder:
+                    (context, child) {
+                  double scale = 1.0;
 
-                  final distance = (page - index).abs();
+                  if (_promoController
+                          .hasClients &&
+                      _promoController
+                          .position
+                          .haveDimensions) {
+                    final page =
+                        _promoController.page ??
+                            _promoController
+                                .initialPage
+                                .toDouble();
 
-                  scale = (1 - (distance * 0.025)).clamp(0.97, 1.0);
-                }
+                    final distance =
+                        (page - index).abs();
 
-                return Transform.scale(
-                  scale: scale,
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 3),
-                    child: child,
-                  ),
-                );
-              },
-              child: _PromoBanner(
-                data: promo,
-              ),
-            );
-          },
+                    scale = (1 -
+                            (distance * 0.025))
+                        .clamp(0.97, 1.0);
+                  }
+
+                  return Transform.scale(
+                    scale: scale,
+                    child: Padding(
+                      padding:
+                          const EdgeInsets.symmetric(
+                        horizontal: 3,
+                      ),
+                      child: child,
+                    ),
+                  );
+                },
+                child: _PromoBanner(
+                  data: promo,
+                ),
+              );
+            },
+          ),
         ),
-      ),
 
-      const SizedBox(height: 10),
+        const SizedBox(height: 10),
 
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: List.generate(
-          _promos.length,
-          (index) {
-            final selected = index == _currentPromo;
+        Row(
+          mainAxisAlignment:
+              MainAxisAlignment.center,
+          children: List.generate(
+            _promos.length,
+            (index) {
+              final selected =
+                  index == _currentPromo;
 
-            return AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              width: selected ? 20 : 6,
-              height: 5,
-              margin: const EdgeInsets.symmetric(horizontal: 3),
-              decoration: BoxDecoration(
-                color: selected
-                    ? AppColors.brand
-                    : AppColors.muted.withOpacity(0.25),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            );
-          },
+              return AnimatedContainer(
+                duration:
+                    const Duration(
+                  milliseconds: 300,
+                ),
+                width: selected ? 20 : 6,
+                height: 5,
+                margin:
+                    const EdgeInsets.symmetric(
+                  horizontal: 3,
+                ),
+                decoration:
+                    BoxDecoration(
+                  color: selected
+                      ? AppColors.brand
+                      : AppColors.of(context)
+                          .muted
+                          .withOpacity(0.25),
+                  borderRadius:
+                      BorderRadius.circular(10),
+                ),
+              );
+            },
+          ),
         ),
-      ),
-    ],
-  );
-}
+      ],
+    );
+  }
+
+  // ---------------------------------------------------------------------------
+  // CATEGORIES
+  // ---------------------------------------------------------------------------
 
   Widget _buildCategories(
     List<String> categories,
     String selectedCategory,
   ) {
     return Padding(
-      padding: const EdgeInsets.only(top: 22),
+      padding:
+          const EdgeInsets.only(top: 22),
       child: SizedBox(
         height: 105,
         child: ListView.separated(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          scrollDirection: Axis.horizontal,
-          physics: const BouncingScrollPhysics(),
+          padding:
+              const EdgeInsets.symmetric(
+            horizontal: 16,
+          ),
+          scrollDirection:
+              Axis.horizontal,
+          physics:
+              const BouncingScrollPhysics(),
           itemCount: categories.length,
-          separatorBuilder: (_, __) => const SizedBox(width: 12),
-          itemBuilder: (context, index) {
-            final category = categories[index];
+          separatorBuilder:
+              (_, __) =>
+                  const SizedBox(width: 12),
+          itemBuilder:
+              (context, index) {
+            final category =
+                categories[index];
 
-            final isSelected = category == selectedCategory;
+            final isSelected =
+                category ==
+                    selectedCategory;
 
             final icon =
-                categoryIcons[category] ?? Icons.category_rounded;
+                categoryIcons[category] ??
+                    Icons.category_rounded;
 
             return GestureDetector(
-              behavior: HitTestBehavior.opaque,
+              behavior:
+                  HitTestBehavior.opaque,
               onTap: () {
                 ref
-                    .read(selectedCategoryProvider.notifier)
+                    .read(
+                      selectedCategoryProvider
+                          .notifier,
+                    )
                     .state = category;
               },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 280),
-                curve: Curves.easeOutCubic,
+              child:
+                  AnimatedContainer(
+                duration:
+                    const Duration(
+                  milliseconds: 280,
+                ),
+                curve:
+                    Curves.easeOutCubic,
                 width: 68,
-                padding: const EdgeInsets.symmetric(
+                padding:
+                    const EdgeInsets.symmetric(
                   vertical: 3,
                 ),
                 child: Column(
                   children: [
                     AnimatedContainer(
-                      duration: const Duration(milliseconds: 280),
-                      curve: Curves.easeOutBack,
-                      width: isSelected ? 60 : 56,
-                      height: isSelected ? 60 : 56,
-                      decoration: BoxDecoration(
+                      duration:
+                          const Duration(
+                        milliseconds: 280,
+                      ),
+                      curve:
+                          Curves.easeOutBack,
+                      width:
+                          isSelected ? 60 : 56,
+                      height:
+                          isSelected ? 60 : 56,
+                      decoration:
+                          BoxDecoration(
                         color: isSelected
                             ? AppColors.brand
                             : Colors.white,
-                        borderRadius: BorderRadius.circular(
-                          isSelected ? 19 : 18,
+                        borderRadius:
+                            BorderRadius
+                                .circular(
+                          isSelected
+                              ? 19
+                              : 18,
                         ),
-                        border: Border.all(
+                        border:
+                            Border.all(
                           color: isSelected
                               ? AppColors.brand
-                              : Colors.black.withOpacity(0.035),
+                              : Colors.black
+                                  .withOpacity(
+                                  0.035,
+                                ),
                         ),
                         boxShadow: [
                           BoxShadow(
                             color: isSelected
-                                ? AppColors.brand.withOpacity(0.20)
-                                : Colors.black.withOpacity(0.045),
-                            blurRadius: isSelected ? 14 : 9,
-                            offset: const Offset(0, 5),
+                                ? AppColors
+                                    .brand
+                                    .withOpacity(
+                                    0.20,
+                                  )
+                                : Colors.black
+                                    .withOpacity(
+                                    0.045,
+                                  ),
+                            blurRadius:
+                                isSelected
+                                    ? 14
+                                    : 9,
+                            offset:
+                                const Offset(
+                              0,
+                              5,
+                            ),
                           ),
                         ],
                       ),
-                      child: AnimatedSwitcher(
-                        duration: const Duration(milliseconds: 220),
-                        transitionBuilder: (child, animation) {
+                      child:
+                          AnimatedSwitcher(
+                        duration:
+                            const Duration(
+                          milliseconds: 220,
+                        ),
+                        transitionBuilder:
+                            (
+                          child,
+                          animation,
+                        ) {
                           return ScaleTransition(
                             scale: animation,
                             child: child,
@@ -469,33 +622,51 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                         },
                         child: Icon(
                           icon,
-                          key: ValueKey(isSelected),
+                          key: ValueKey(
+                            isSelected,
+                          ),
                           color: isSelected
                               ? Colors.white
                               : AppColors.brand,
-                          size: isSelected ? 25 : 23,
+                          size: isSelected
+                              ? 25
+                              : 23,
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 8),
+                    const SizedBox(
+                      height: 8,
+                    ),
 
                     AnimatedDefaultTextStyle(
-                      duration: const Duration(milliseconds: 220),
-                      style: AppText.label.copyWith(
+                      duration:
+                          const Duration(
+                        milliseconds: 220,
+                      ),
+                      style:
+                          AppText.label
+                              .copyWith(
                         color: isSelected
-                            ? AppColors.ink
-                            : AppColors.muted,
+                            ? AppColors
+                                .of(context)
+                                .ink
+                            : AppColors
+                                .of(context)
+                                .muted,
                         fontSize: 10.5,
-                        fontWeight: isSelected
-                            ? FontWeight.w700
-                            : FontWeight.w500,
+                        fontWeight:
+                            isSelected
+                                ? FontWeight.w700
+                                : FontWeight.w500,
                       ),
                       child: Text(
                         category,
                         maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        textAlign: TextAlign.center,
+                        overflow:
+                            TextOverflow.ellipsis,
+                        textAlign:
+                            TextAlign.center,
                       ),
                     ),
                   ],
@@ -508,17 +679,31 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
-  Widget _buildProductsHeader(String selectedCategory) {
+  // ---------------------------------------------------------------------------
+  // PRODUCTS HEADER
+  // ---------------------------------------------------------------------------
+
+  Widget _buildProductsHeader(
+    String selectedCategory,
+  ) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(16, 22, 16, 14),
+      padding:
+          const EdgeInsets.fromLTRB(
+        16,
+        22,
+        16,
+        14,
+      ),
       child: Row(
         children: [
           Container(
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: AppColors.brand.withOpacity(0.10),
-              borderRadius: BorderRadius.circular(11),
+              color: AppColors.brand
+                  .withOpacity(0.10),
+              borderRadius:
+                  BorderRadius.circular(11),
             ),
             child: const Icon(
               Icons.bolt_rounded,
@@ -531,22 +716,30 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
 
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
                 Text(
                   selectedCategory == 'All'
                       ? 'Popular right now'
                       : selectedCategory,
-                  style: AppText.heading.copyWith(
+                  style:
+                      AppText.heading.copyWith(
                     fontSize: 17,
-                    fontWeight: FontWeight.w800,
+                    fontWeight:
+                        FontWeight.w800,
                   ),
                 ),
+
                 const SizedBox(height: 2),
+
                 Text(
                   'Top picks for you',
-                  style: AppText.label.copyWith(
-                    color: AppColors.muted,
+                  style:
+                      AppText.label.copyWith(
+                    color:
+                        AppColors.of(context)
+                            .muted,
                     fontSize: 10.5,
                   ),
                 ),
@@ -555,18 +748,40 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
           ),
 
           GestureDetector(
-            onTap: () {},
+            onTap: () {
+              final products =
+                  ref.read(
+                filteredProductListProvider,
+              );
+
+              Navigator.of(context).pushNamed(
+                AppRoutes.seeAll,
+                arguments: SeeAllArgs(
+                  title:
+                      selectedCategory ==
+                              'All'
+                          ? 'Popular right now'
+                          : selectedCategory,
+                  products: products,
+                ),
+              );
+            },
             child: Row(
               children: [
                 Text(
                   'See all',
-                  style: AppText.label.copyWith(
-                    color: AppColors.brand,
+                  style:
+                      AppText.label.copyWith(
+                    color:
+                        AppColors.brand,
                     fontSize: 12,
-                    fontWeight: FontWeight.w700,
+                    fontWeight:
+                        FontWeight.w700,
                   ),
                 ),
+
                 const SizedBox(width: 2),
+
                 const Icon(
                   Icons.chevron_right_rounded,
                   color: AppColors.brand,
@@ -580,18 +795,28 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 
+  // ---------------------------------------------------------------------------
+  // EMPTY STATE
+  // ---------------------------------------------------------------------------
+
   Widget _buildEmptyState() {
     return Center(
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 100),
+        padding:
+            const EdgeInsets.only(
+          bottom: 100,
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment:
+              MainAxisAlignment.center,
           children: [
             Container(
               width: 72,
               height: 72,
-              decoration: BoxDecoration(
-                color: AppColors.brand.withOpacity(0.08),
+              decoration:
+                  BoxDecoration(
+                color: AppColors.brand
+                    .withOpacity(0.08),
                 shape: BoxShape.circle,
               ),
               child: const Icon(
@@ -600,18 +825,26 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 color: AppColors.brand,
               ),
             ),
+
             const SizedBox(height: 16),
+
             Text(
               'No products found',
-              style: AppText.heading.copyWith(
+              style:
+                  AppText.heading.copyWith(
                 fontSize: 17,
               ),
             ),
+
             const SizedBox(height: 6),
+
             Text(
               'Try another search or category',
-              style: AppText.body.copyWith(
-                color: AppColors.muted,
+              style:
+                  AppText.body.copyWith(
+                color:
+                    AppColors.of(context)
+                        .muted,
                 fontSize: 13,
               ),
             ),
@@ -621,6 +854,10 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     );
   }
 }
+
+// =============================================================================
+// PROMO DATA
+// =============================================================================
 
 class _PromoData {
   final String title;
@@ -638,6 +875,10 @@ class _PromoData {
   });
 }
 
+// =============================================================================
+// PROMO BANNER
+// =============================================================================
+
 class _PromoBanner extends StatelessWidget {
   final _PromoData data;
 
@@ -648,15 +889,21 @@ class _PromoBanner extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      clipBehavior: Clip.antiAlias,
+      clipBehavior:
+          Clip.antiAlias,
       decoration: BoxDecoration(
         color: data.color,
-        borderRadius: BorderRadius.circular(23),
+        borderRadius:
+            BorderRadius.circular(23),
         boxShadow: [
           BoxShadow(
-            color: data.color.withOpacity(0.25),
+            color:
+                data.color.withOpacity(
+              0.25,
+            ),
             blurRadius: 20,
-            offset: const Offset(0, 9),
+            offset:
+                const Offset(0, 9),
           ),
         ],
       ),
@@ -668,9 +915,12 @@ class _PromoBanner extends StatelessWidget {
             child: Container(
               width: 145,
               height: 145,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.07),
-                shape: BoxShape.circle,
+              decoration:
+                  BoxDecoration(
+                color: Colors.white
+                    .withOpacity(0.07),
+                shape:
+                    BoxShape.circle,
               ),
             ),
           ),
@@ -681,9 +931,12 @@ class _PromoBanner extends StatelessWidget {
             child: Container(
               width: 150,
               height: 150,
-              decoration: BoxDecoration(
-                color: Colors.white.withOpacity(0.06),
-                shape: BoxShape.circle,
+              decoration:
+                  BoxDecoration(
+                color: Colors.white
+                    .withOpacity(0.06),
+                shape:
+                    BoxShape.circle,
               ),
             ),
           ),
@@ -696,32 +949,47 @@ class _PromoBanner extends StatelessWidget {
               child: Icon(
                 data.icon,
                 size: 110,
-                color: Colors.white.withOpacity(0.13),
+                color: Colors.white
+                    .withOpacity(0.13),
               ),
             ),
           ),
 
           Padding(
-            padding: const EdgeInsets.fromLTRB(20, 17, 20, 17),
+            padding:
+                const EdgeInsets.fromLTRB(
+              20,
+              17,
+              20,
+              17,
+            ),
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+              crossAxisAlignment:
+                  CrossAxisAlignment.start,
               children: [
-                // Small label
                 Container(
-                  padding: const EdgeInsets.symmetric(
+                  padding:
+                      const EdgeInsets.symmetric(
                     horizontal: 9,
                     vertical: 5,
                   ),
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.16),
-                    borderRadius: BorderRadius.circular(20),
+                  decoration:
+                      BoxDecoration(
+                    color: Colors.white
+                        .withOpacity(0.16),
+                    borderRadius:
+                        BorderRadius.circular(
+                      20,
+                    ),
                   ),
                   child: Text(
                     'LIMITED OFFER',
-                    style: AppText.label.copyWith(
+                    style:
+                        AppText.label.copyWith(
                       color: Colors.white,
                       fontSize: 8.5,
-                      fontWeight: FontWeight.w800,
+                      fontWeight:
+                          FontWeight.w800,
                       letterSpacing: 0.7,
                     ),
                   ),
@@ -731,10 +999,12 @@ class _PromoBanner extends StatelessWidget {
 
                 Text(
                   data.title,
-                  style: AppText.heading.copyWith(
+                  style:
+                      AppText.heading.copyWith(
                     color: Colors.white,
                     fontSize: 22,
-                    fontWeight: FontWeight.w800,
+                    fontWeight:
+                        FontWeight.w800,
                   ),
                 ),
 
@@ -742,8 +1012,10 @@ class _PromoBanner extends StatelessWidget {
 
                 Text(
                   data.subtitle,
-                  style: AppText.body.copyWith(
-                    color: Colors.white.withOpacity(0.88),
+                  style:
+                      AppText.body.copyWith(
+                    color: Colors.white
+                        .withOpacity(0.88),
                     fontSize: 11.5,
                   ),
                 ),
@@ -751,20 +1023,27 @@ class _PromoBanner extends StatelessWidget {
                 const SizedBox(height: 9),
 
                 Container(
-                  padding: const EdgeInsets.symmetric(
+                  padding:
+                      const EdgeInsets.symmetric(
                     horizontal: 11,
                     vertical: 6,
                   ),
-                  decoration: BoxDecoration(
+                  decoration:
+                      BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius:
+                        BorderRadius.circular(
+                      10,
+                    ),
                   ),
                   child: Text(
                     data.buttonText,
-                    style: AppText.label.copyWith(
+                    style:
+                        AppText.label.copyWith(
                       color: data.color,
                       fontSize: 10,
-                      fontWeight: FontWeight.w800,
+                      fontWeight:
+                          FontWeight.w800,
                     ),
                   ),
                 ),
@@ -777,7 +1056,12 @@ class _PromoBanner extends StatelessWidget {
   }
 }
 
-class _HeaderIconButton extends StatelessWidget {
+// =============================================================================
+// HEADER BUTTON
+// =============================================================================
+
+class _HeaderIconButton
+    extends StatelessWidget {
   final IconData icon;
   final VoidCallback onTap;
   final bool showBadge;
@@ -793,28 +1077,39 @@ class _HeaderIconButton extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Stack(
-        clipBehavior: Clip.none,
+        clipBehavior:
+            Clip.none,
         children: [
           Container(
             width: 44,
             height: 44,
-            decoration: BoxDecoration(
+            decoration:
+                BoxDecoration(
               color: Colors.white,
-              borderRadius: BorderRadius.circular(14),
-              border: Border.all(
-                color: Colors.black.withOpacity(0.035),
+              borderRadius:
+                  BorderRadius.circular(
+                14,
+              ),
+              border:
+                  Border.all(
+                color: Colors.black
+                    .withOpacity(0.035),
               ),
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.035),
+                  color: Colors.black
+                      .withOpacity(0.035),
                   blurRadius: 10,
-                  offset: const Offset(0, 4),
+                  offset:
+                      const Offset(0, 4),
                 ),
               ],
             ),
             child: Icon(
               icon,
-              color: AppColors.ink,
+              color:
+                  AppColors.of(context)
+                      .ink,
               size: 22,
             ),
           ),
@@ -826,10 +1121,14 @@ class _HeaderIconButton extends StatelessWidget {
               child: Container(
                 width: 7,
                 height: 7,
-                decoration: BoxDecoration(
-                  color: AppColors.brand,
-                  shape: BoxShape.circle,
-                  border: Border.all(
+                decoration:
+                    BoxDecoration(
+                  color:
+                      AppColors.brand,
+                  shape:
+                      BoxShape.circle,
+                  border:
+                      Border.all(
                     color: Colors.white,
                     width: 1.5,
                   ),
@@ -842,7 +1141,12 @@ class _HeaderIconButton extends StatelessWidget {
   }
 }
 
-class _AnimatedProductItem extends StatefulWidget {
+// =============================================================================
+// PRODUCT ANIMATION
+// =============================================================================
+
+class _AnimatedProductItem
+    extends StatefulWidget {
   final int index;
   final Widget child;
 
@@ -852,27 +1156,40 @@ class _AnimatedProductItem extends StatefulWidget {
   });
 
   @override
-  State<_AnimatedProductItem> createState() =>
-      _AnimatedProductItemState();
+  State<_AnimatedProductItem>
+      createState() =>
+          _AnimatedProductItemState();
 }
 
 class _AnimatedProductItemState
     extends State<_AnimatedProductItem>
-    with SingleTickerProviderStateMixin {
-  late final AnimationController _controller;
+    with
+        SingleTickerProviderStateMixin {
+  late final AnimationController
+      _controller;
 
-  late final Animation<double> _opacity;
-  late final Animation<Offset> _slide;
-  late final Animation<double> _scale;
+  late final Animation<double>
+      _opacity;
+
+  late final Animation<Offset>
+      _slide;
+
+  late final Animation<double>
+      _scale;
 
   @override
   void initState() {
     super.initState();
 
-    _controller = AnimationController(
+    _controller =
+        AnimationController(
       vsync: this,
       duration: Duration(
-        milliseconds: 400 + (widget.index.clamp(0, 5) * 50),
+        milliseconds:
+            400 +
+            (widget.index
+                    .clamp(0, 5) *
+                50),
       ),
     );
 
@@ -881,29 +1198,37 @@ class _AnimatedProductItemState
       curve: Curves.easeOut,
     );
 
-    _slide = Tween<Offset>(
-      begin: const Offset(0, 0.08),
+    _slide =
+        Tween<Offset>(
+      begin:
+          const Offset(0, 0.08),
       end: Offset.zero,
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeOutCubic,
+        curve:
+            Curves.easeOutCubic,
       ),
     );
 
-    _scale = Tween<double>(
+    _scale =
+        Tween<double>(
       begin: 0.97,
       end: 1,
     ).animate(
       CurvedAnimation(
         parent: _controller,
-        curve: Curves.easeOutCubic,
+        curve:
+            Curves.easeOutCubic,
       ),
     );
 
     Future.delayed(
       Duration(
-        milliseconds: (widget.index.clamp(0, 6)) * 45,
+        milliseconds:
+            widget.index
+                    .clamp(0, 6) *
+                45,
       ),
       () {
         if (mounted) {
@@ -920,12 +1245,16 @@ class _AnimatedProductItemState
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(
+    BuildContext context,
+  ) {
     return FadeTransition(
       opacity: _opacity,
-      child: SlideTransition(
+      child:
+          SlideTransition(
         position: _slide,
-        child: ScaleTransition(
+        child:
+            ScaleTransition(
           scale: _scale,
           child: widget.child,
         ),

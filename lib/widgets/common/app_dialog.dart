@@ -6,10 +6,6 @@ import '../../theme.dart';
 class AppDialog {
   AppDialog._();
 
-  // ===========================================================================
-  // CONFIRM DIALOG
-  // ===========================================================================
-
   static Future<bool> showConfirm(
     BuildContext context, {
     required String title,
@@ -69,10 +65,6 @@ class AppDialog {
     return result ?? false;
   }
 
-  // ===========================================================================
-  // SUCCESS
-  // ===========================================================================
-
   static Future<void> showSuccess(
     BuildContext context, {
     required String title,
@@ -90,10 +82,6 @@ class AppDialog {
       onPressed: onPressed,
     );
   }
-
-  // ===========================================================================
-  // ERROR
-  // ===========================================================================
 
   static Future<void> showError(
     BuildContext context, {
@@ -113,10 +101,6 @@ class AppDialog {
     );
   }
 
-  // ===========================================================================
-  // INFO
-  // ===========================================================================
-
   static Future<void> showInfo(
     BuildContext context, {
     required String title,
@@ -134,10 +118,6 @@ class AppDialog {
       onPressed: onPressed,
     );
   }
-
-  // ===========================================================================
-  // MESSAGE DIALOG
-  // ===========================================================================
 
   static Future<void> _showMessage(
     BuildContext context, {
@@ -199,10 +179,6 @@ class AppDialog {
   }
 }
 
-// =============================================================================
-// CONFIRM DIALOG
-// =============================================================================
-
 class _ConfirmDialog extends StatelessWidget {
   final String title;
   final String message;
@@ -229,7 +205,7 @@ class _ConfirmDialog extends StatelessWidget {
         width: 320,
         margin: const EdgeInsets.symmetric(horizontal: 24),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: AppColors.of(context).surface,
           borderRadius: BorderRadius.circular(22),
         ),
         clipBehavior: Clip.antiAlias,
@@ -260,7 +236,7 @@ class _ConfirmDialog extends StatelessWidget {
                     message,
                     textAlign: TextAlign.center,
                     style: AppText.body.copyWith(
-                      color: AppColors.muted,
+                      color: AppColors.of(context).muted,
                       fontSize: 13.5,
                       height: 1.4,
                     ),
@@ -271,7 +247,7 @@ class _ConfirmDialog extends StatelessWidget {
 
             Container(
               height: 0.7,
-              color: AppColors.line,
+              color: AppColors.of(context).line,
             ),
 
             IntrinsicHeight(
@@ -280,7 +256,7 @@ class _ConfirmDialog extends StatelessWidget {
                   Expanded(
                     child: _DialogAction(
                       label: cancelText,
-                      color: AppColors.ink,
+                      color: AppColors.of(context).ink,
                       fontWeight: FontWeight.w500,
                       onTap: () {
                         Navigator.pop(context, false);
@@ -290,7 +266,7 @@ class _ConfirmDialog extends StatelessWidget {
 
                   Container(
                     width: 0.7,
-                    color: AppColors.line,
+                    color: AppColors.of(context).line,
                   ),
 
                   Expanded(
@@ -312,10 +288,6 @@ class _ConfirmDialog extends StatelessWidget {
     );
   }
 }
-
-// =============================================================================
-// MESSAGE DIALOG
-// =============================================================================
 
 class _MessageDialog extends StatelessWidget {
   final IconData icon;
@@ -342,7 +314,7 @@ class _MessageDialog extends StatelessWidget {
         width: 320,
         margin: const EdgeInsets.symmetric(horizontal: 24),
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: AppColors.of(context).surface,
           borderRadius: BorderRadius.circular(22),
         ),
         clipBehavior: Clip.antiAlias,
@@ -390,7 +362,7 @@ class _MessageDialog extends StatelessWidget {
                     message,
                     textAlign: TextAlign.center,
                     style: AppText.body.copyWith(
-                      color: AppColors.muted,
+                      color: AppColors.of(context).muted,
                       fontSize: 13.5,
                       height: 1.4,
                     ),
@@ -401,7 +373,7 @@ class _MessageDialog extends StatelessWidget {
 
             Container(
               height: 0.7,
-              color: AppColors.line,
+              color: AppColors.of(context).line,
             ),
 
             SizedBox(
@@ -423,10 +395,6 @@ class _MessageDialog extends StatelessWidget {
     );
   }
 }
-
-// =============================================================================
-// ACTION BUTTON
-// =============================================================================
 
 class _DialogAction extends StatelessWidget {
   final String label;

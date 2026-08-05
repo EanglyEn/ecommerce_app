@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:ecommerce_app/app_router.dart';
+import 'package:ecommerce_app/widgets/help_center_sheet.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:image_picker/image_picker.dart';
@@ -22,8 +24,7 @@ class _AccountScreenState extends State<AccountScreen> {
   String _name = 'Eangly';
   String _location = 'Phnom Penh, Cambodia';
 
-  final String _defaultProfileImage =
-      'https://i.pravatar.cc/300?img=12';
+  final String _defaultProfileImage = 'https://i.pravatar.cc/300?img=12';
 
   final String _coverImage =
       'https://images.unsplash.com/photo-1441986300917-64674bd600d8';
@@ -34,7 +35,7 @@ class _AccountScreenState extends State<AccountScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: AppColors.bg,
+      backgroundColor: AppColors.of(context).bg,
       body: CustomScrollView(
         physics: const BouncingScrollPhysics(),
         slivers: [
@@ -49,9 +50,8 @@ class _AccountScreenState extends State<AccountScreen> {
                   : _defaultProfileImage,
 
               // Cover image
-              coverImage: _coverImageFile != null
-                  ? _coverImageFile!.path
-                  : _coverImage,
+              coverImage:
+                  _coverImageFile != null ? _coverImageFile!.path : _coverImage,
 
               orders: '12',
               wishlist: '8',
@@ -72,7 +72,6 @@ class _AccountScreenState extends State<AccountScreen> {
               },
             ),
           ),
-
           SliverPadding(
             padding: const EdgeInsets.fromLTRB(
               16,
@@ -86,37 +85,36 @@ class _AccountScreenState extends State<AccountScreen> {
                   MenuTile(
                     icon: Icons.receipt_long_rounded,
                     label: 'My Orders',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushNamed(AppRoutes.orders);
+                    },
                   ),
-
                   MenuTile(
-                    icon: Icons.favorite_border_rounded,
-                    label: 'Wishlist',
-                    onTap: () {},
-                  ),
-
+                      icon: Icons.favorite_border_rounded,
+                      label: 'Wishlist',
+                      onTap: () {
+                        Navigator.of(context).pushNamed(AppRoutes.wishlist);
+                      }),
                   MenuTile(
                     icon: Icons.location_on_outlined,
                     label: 'Addresses',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushNamed(AppRoutes.addresses);
+                    },
                   ),
-
-                  MenuTile(
-                    icon: Icons.payment_rounded,
-                    label: 'Payment Methods',
-                    onTap: () {},
-                  ),
-
                   MenuTile(
                     icon: Icons.settings_outlined,
                     label: 'Settings',
-                    onTap: () {},
+                    onTap: () {
+                      Navigator.of(context).pushNamed(AppRoutes.settings);
+                    },
                   ),
-
                   MenuTile(
                     icon: Icons.help_outline_rounded,
                     label: 'Help Center',
-                    onTap: () {},
+                    onTap: () {
+                      showHelpCenterSheet(context);
+                    },
                   ),
                 ],
               ),
@@ -147,14 +145,12 @@ class _AccountScreenState extends State<AccountScreen> {
       builder: (sheetContext) {
         return Padding(
           padding: EdgeInsets.only(
-            bottom: MediaQuery.of(sheetContext)
-                .viewInsets
-                .bottom,
+            bottom: MediaQuery.of(sheetContext).viewInsets.bottom,
           ),
           child: Container(
-            decoration: const BoxDecoration(
-              color: AppColors.surface,
-              borderRadius: BorderRadius.vertical(
+            decoration: BoxDecoration(
+              color: AppColors.of(context).surface,
+              borderRadius: const BorderRadius.vertical(
                 top: Radius.circular(28),
               ),
             ),
@@ -174,7 +170,7 @@ class _AccountScreenState extends State<AccountScreen> {
                     width: 40,
                     height: 4,
                     decoration: BoxDecoration(
-                      color: AppColors.line,
+                      color: AppColors.of(context).line,
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
@@ -193,7 +189,6 @@ class _AccountScreenState extends State<AccountScreen> {
                           ),
                         ),
                       ),
-
                       IconButton(
                         onPressed: () {
                           Navigator.pop(sheetContext);
@@ -224,8 +219,7 @@ class _AccountScreenState extends State<AccountScreen> {
                   // Name
                   TextField(
                     controller: nameController,
-                    textCapitalization:
-                        TextCapitalization.words,
+                    textCapitalization: TextCapitalization.words,
                     decoration: const InputDecoration(
                       hintText: 'Enter your name',
                       prefixIcon: Icon(
@@ -256,15 +250,11 @@ class _AccountScreenState extends State<AccountScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         setState(() {
-                          _name = nameController.text
-                                  .trim()
-                                  .isEmpty
+                          _name = nameController.text.trim().isEmpty
                               ? 'Eangly'
                               : nameController.text.trim();
 
-                          _location = locationController.text
-                                  .trim()
-                                  .isEmpty
+                          _location = locationController.text.trim().isEmpty
                               ? 'Phnom Penh, Cambodia'
                               : locationController.text.trim();
                         });
@@ -300,7 +290,7 @@ class _AccountScreenState extends State<AccountScreen> {
             color: Colors.white,
             shape: BoxShape.circle,
             border: Border.all(
-              color: AppColors.line,
+              color: AppColors.of(context).line,
             ),
           ),
           child: ClipOval(
@@ -315,7 +305,6 @@ class _AccountScreenState extends State<AccountScreen> {
                   ),
           ),
         ),
-
         Positioned(
           right: 0,
           bottom: 2,
@@ -374,7 +363,7 @@ class _AccountScreenState extends State<AccountScreen> {
 
                 Container(
                   decoration: BoxDecoration(
-                    color: AppColors.surface,
+                    color: AppColors.of(context).surface,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   clipBehavior: Clip.antiAlias,
@@ -392,7 +381,7 @@ class _AccountScreenState extends State<AccountScreen> {
                               ? 'Change profile photo'
                               : 'Change cover photo',
                           style: AppText.body.copyWith(
-                            color: AppColors.muted,
+                            color: AppColors.of(context).muted,
                             fontSize: 13,
                             fontWeight: FontWeight.w600,
                           ),
@@ -444,7 +433,7 @@ class _AccountScreenState extends State<AccountScreen> {
                 SizedBox(
                   width: double.infinity,
                   child: CupertinoButton(
-                    color: AppColors.surface,
+                    color: AppColors.of(context).surface,
                     borderRadius: BorderRadius.circular(16),
                     onPressed: () {
                       Navigator.pop(sheetContext);

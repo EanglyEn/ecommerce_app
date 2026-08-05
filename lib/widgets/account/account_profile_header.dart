@@ -37,7 +37,7 @@ class AccountProfileHeader extends StatelessWidget {
     return Column(
       children: [
         _buildCover(context),
-        _buildInformation(),
+        _buildInformation(context),
       ],
     );
   }
@@ -99,13 +99,13 @@ class AccountProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _buildInformation() {
+  Widget _buildInformation(BuildContext context) {
     return Stack(
       clipBehavior: Clip.none,
       children: [
         Container(
           width: double.infinity,
-          color: AppColors.surface,
+          color: AppColors.of(context).surface,
           padding: const EdgeInsets.fromLTRB(
             20,
             50,
@@ -138,7 +138,7 @@ class AccountProfileHeader extends StatelessWidget {
                       location,
                       overflow: TextOverflow.ellipsis,
                       style: AppText.body.copyWith(
-                        color: AppColors.muted,
+                        color: AppColors.of(context).muted,
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
                       ),
@@ -158,7 +158,7 @@ class AccountProfileHeader extends StatelessWidget {
                     ),
                   ),
 
-                  _divider(),
+                  _divider(context),
 
                   Expanded(
                     child: AccountProfileStat(
@@ -167,7 +167,7 @@ class AccountProfileHeader extends StatelessWidget {
                     ),
                   ),
 
-                  _divider(),
+                  _divider(context),
 
                   Expanded(
                     child: AccountProfileStat(
@@ -196,11 +196,11 @@ class AccountProfileHeader extends StatelessWidget {
     );
   }
 
-  Widget _divider() {
+  Widget _divider(BuildContext context) {
     return Container(
       width: 1,
       height: 30,
-      color: AppColors.line,
+      color: AppColors.of(context).line,
     );
   }
 

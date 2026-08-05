@@ -13,20 +13,35 @@ class AppSnackBar {
     Color? iconColor,
     Duration duration = const Duration(seconds: 3),
   }) {
+    final theme = Theme.of(context);
+    final colors = AppColors.of(context);
+    final snackBarTheme = theme.snackBarTheme;
+    final backgroundColor = snackBarTheme.backgroundColor ?? colors.dark;
+    final textStyle = snackBarTheme.contentTextStyle?.copyWith(
+          fontSize: 13.5,
+          fontWeight: FontWeight.w600,
+        ) ??
+        AppText.body.copyWith(
+          color: Colors.white,
+          fontSize: 13.5,
+          fontWeight: FontWeight.w600,
+        );
+    final iconBackgroundOpacity = theme.brightness == Brightness.dark ? 0.18 : 0.12;
+
     ScaffoldMessenger.of(context)
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          behavior: SnackBarBehavior.floating,
+          behavior: snackBarTheme.behavior ?? SnackBarBehavior.floating,
           duration: duration,
-          backgroundColor: AppColors.ink,
-          elevation: 0,
+          backgroundColor: backgroundColor,
+          elevation: snackBarTheme.elevation ?? 0,
           margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
           padding: const EdgeInsets.symmetric(
             horizontal: 14,
             vertical: 12,
           ),
-          shape: RoundedRectangleBorder(
+          shape: snackBarTheme.shape ?? RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(16),
           ),
           content: Row(
@@ -36,7 +51,7 @@ class AppSnackBar {
                 height: 34,
                 decoration: BoxDecoration(
                   color: (iconColor ?? AppColors.success)
-                      .withOpacity(0.12),
+                      .withOpacity(iconBackgroundOpacity),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
@@ -51,11 +66,7 @@ class AppSnackBar {
                   message,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  style: AppText.body.copyWith(
-                    color: Colors.white,
-                    fontSize: 13.5,
-                    fontWeight: FontWeight.w600,
-                  ),
+                  style: textStyle,
                 ),
               ),
             ],

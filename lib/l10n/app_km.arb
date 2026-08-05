@@ -1,0 +1,16 @@
+{
+  "settings": "ការកំណត់",
+  "notifications": "ការជូនដំណឹង",
+  "pushNotifications": "ការជូនដំណឹង Push",
+  "emailNotifications": "ការជូនដំណឹងតាមអ៊ីមែល",
+  "appearance": "រូបរាង",
+  "theme": "រូបរាង",
+  "system": "ប្រព័ន្ធ",
+  "light": "ភ្លឺ",
+  "dark": "ងងឹត",
+  "language": "ភាសា",
+  "chooseLanguage": "ជ្រើសរើសភាសា",
+  "account": "គណនី",
+  "changePassword": "ប្តូរពាក្យសម្ងាត់",
+  "deleteAccount": "លុបគណនី"
+}

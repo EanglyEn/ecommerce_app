@@ -53,7 +53,6 @@ class AppShare {
     }
   }
 
-  /// Share image + title + description.
   static Future<void> imageWithDetails({
     required String imageUrl,
     required String title,

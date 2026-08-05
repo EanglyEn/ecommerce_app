@@ -17,13 +17,15 @@ class MenuTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+
     return Container(
       margin: const EdgeInsets.only(bottom: 10),
       decoration: BoxDecoration(
-        color: AppColors.surface,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(17),
         border: Border.all(
-          color: AppColors.line.withOpacity(0.65),
+          color: colors.line.withOpacity(0.65),
         ),
         boxShadow: [
           BoxShadow(
@@ -63,18 +65,19 @@ class MenuTile extends StatelessWidget {
                 style: AppText.body.copyWith(
                   fontWeight: FontWeight.w800,
                   fontSize: 13.5,
+                  color: colors.ink,
                 ),
               ),
               trailing: Container(
                 width: 30,
                 height: 30,
-                decoration: const BoxDecoration(
-                  color: AppColors.bg,
+                decoration: BoxDecoration(
+                  color: colors.bg,
                   shape: BoxShape.circle,
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.chevron_right_rounded,
-                  color: AppColors.muted,
+                  color: colors.muted,
                   size: 19,
                 ),
               ),

@@ -2,6 +2,7 @@
 
 import 'dart:ui';
 
+import 'package:ecommerce_app/app_router.dart';
 import 'package:ecommerce_app/widgets/common/app_share.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +10,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../models/product.dart';
 import '../../providers/product_provider.dart';
 import '../../theme.dart';
-import '../product/product_detail_screen.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
   const ExploreScreen({super.key});
@@ -37,12 +37,9 @@ class _ExploreScreenState extends ConsumerState<ExploreScreen> {
   }
 
   void _openProduct(Product product) {
-    Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (_) => ProductDetailScreen(
-          product: product,
-        ),
-      ),
+    Navigator.of(context).pushNamed(
+      AppRoutes.productDetail,
+      arguments: product,
     );
   }
 

@@ -35,10 +35,10 @@ class ProductCard extends ConsumerWidget {
       behavior: HitTestBehavior.opaque,
       child: Container(
         decoration: BoxDecoration(
-          color: AppColors.surface,
+          color: AppColors.of(context).surface,
           borderRadius: BorderRadius.circular(22),
           border: Border.all(
-            color: AppColors.line.withOpacity(0.6),
+            color: AppColors.of(context).line.withOpacity(0.6),
           ),
           boxShadow: [
             BoxShadow(
@@ -57,13 +57,13 @@ class ProductCard extends ConsumerWidget {
                 fit: StackFit.expand,
                 children: [
                   Container(
-                    decoration: const BoxDecoration(
+                    decoration: BoxDecoration(
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
                         colors: [
-                          AppColors.bg,
-                          AppColors.surface,
+                          AppColors.of(context).bg,
+                          AppColors.of(context).surface,
                         ],
                       ),
                     ),
@@ -87,7 +87,7 @@ class ProductCard extends ConsumerWidget {
                             }
 
                             return Container(
-                              color: AppColors.bg,
+                              color: AppColors.of(context).bg,
                               child: const Center(
                                 child: SizedBox(
                                   width: 20,
@@ -106,12 +106,12 @@ class ProductCard extends ConsumerWidget {
                             stackTrace,
                           ) {
                             return Container(
-                              color: AppColors.bg,
-                              child: const Center(
+                              color: AppColors.of(context).bg,
+                              child: Center(
                                 child: Icon(
                                   Icons.image_not_supported_outlined,
                                   size: 30,
-                                  color: AppColors.muted,
+                                  color: AppColors.of(context).muted,
                                 ),
                               ),
                             );
@@ -237,10 +237,10 @@ class ProductCard extends ConsumerWidget {
                 11,
               ),
               decoration: BoxDecoration(
-                color: AppColors.surface,
+                color: AppColors.of(context).surface,
                 border: Border(
                   top: BorderSide(
-                    color: AppColors.line.withOpacity(0.35),
+                    color: AppColors.of(context).line.withOpacity(0.35),
                   ),
                 ),
               ),
@@ -276,8 +276,8 @@ class ProductCard extends ConsumerWidget {
                       Container(
                         width: 3,
                         height: 3,
-                        decoration: const BoxDecoration(
-                          color: AppColors.muted,
+                        decoration: BoxDecoration(
+                          color: AppColors.of(context).muted,
                           shape: BoxShape.circle,
                         ),
                       ),
@@ -288,7 +288,7 @@ class ProductCard extends ConsumerWidget {
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
                           style: AppText.label.copyWith(
-                            color: AppColors.muted,
+                            color: AppColors.of(context).muted,
                             fontSize: 10.5,
                           ),
                         ),
@@ -313,7 +313,7 @@ class ProductCard extends ConsumerWidget {
                           '\$${product.price.toStringAsFixed(2)}',
                           style: AppText.body.copyWith(
                             decoration: TextDecoration.lineThrough,
-                            color: AppColors.muted,
+                            color: AppColors.of(context).muted,
                             fontSize: 10.5,
                           ),
                         ),
@@ -386,11 +386,11 @@ class _AddButton extends StatelessWidget {
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: AppColors.brand,
+          color: AppColors.add,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.brand.withOpacity(0.35),
+              color: AppColors.add.withOpacity(0.35),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),
@@ -422,10 +422,10 @@ class QuantityStepper extends StatelessWidget {
   Widget build(BuildContext context) {
     return Container(
       decoration: BoxDecoration(
-        color: AppColors.bg,
+        color: AppColors.of(context).bg,
         borderRadius: BorderRadius.circular(30),
         border: Border.all(
-          color: AppColors.line,
+          color: AppColors.of(context).line,
         ),
       ),
       padding: const EdgeInsets.symmetric(

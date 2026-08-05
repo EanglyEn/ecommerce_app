@@ -55,7 +55,7 @@ class AppEmptyState extends StatelessWidget {
                 message!,
                 textAlign: TextAlign.center,
                 style: AppText.body.copyWith(
-                  color: AppColors.muted,
+                  color: AppColors.of(context).muted,
                   fontSize: 13,
                 ),
               ),

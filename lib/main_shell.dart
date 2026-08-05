@@ -45,7 +45,13 @@ class _MainShellState extends ConsumerState<MainShell> {
       extendBody: true,
       body: IndexedStack(
         index: _index,
-        children: screens,
+        children: [
+          for (int i = 0; i < screens.length; i++)
+            HeroMode(
+              enabled: i == _index,
+              child: screens[i],
+            ),
+        ],
       ),
       bottomNavigationBar: _FloatingNavigationBar(
         currentIndex: _index,
@@ -71,12 +77,7 @@ class _FloatingNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return SafeArea(
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(
-          12,
-          0,
-          12,
-          12,
-        ),
+        padding: const EdgeInsets.fromLTRB(12, 0,12, 12,),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
@@ -105,7 +106,7 @@ class _NavigationCapsule extends StatelessWidget {
     required this.onTap,
   });
 
-  static const double height = 76;
+  static const double height = 65;
 
   @override
   Widget build(BuildContext context) {

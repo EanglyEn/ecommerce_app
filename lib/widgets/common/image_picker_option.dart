@@ -84,11 +84,6 @@ class _ImagePickerOptionState extends State<ImagePickerOption> {
   }
 }
 
-// =============================================================================
-// FLOATING MENU CONTAINER
-// Frosted rounded card that wraps a set of ImagePickerOption rows
-// =============================================================================
-
 class ImagePickerMenu extends StatelessWidget {
   final List<Widget> children;
   final double width;

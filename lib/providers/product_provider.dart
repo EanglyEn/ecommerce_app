@@ -103,10 +103,6 @@ final productListProvider = Provider<List<Product>>((ref) {
       rating: 4.7,
     ),
 
-    // ========================================================================
-    // FOOTWEAR
-    // ========================================================================
-
     Product(
       id: 'p2',
       name: 'Running Shoes',
@@ -156,10 +152,6 @@ final productListProvider = Provider<List<Product>>((ref) {
       rating: 4.2,
       discountPercent: 18,
     ),
-
-    // ========================================================================
-    // ACCESSORIES
-    // ========================================================================
 
     Product(
       id: 'p4',
@@ -211,10 +203,6 @@ final productListProvider = Provider<List<Product>>((ref) {
       rating: 4.7,
     ),
 
-    // ========================================================================
-    // HOME
-    // ========================================================================
-
     Product(
       id: 'p6',
       name: 'Coffee Maker',
@@ -263,10 +251,6 @@ final productListProvider = Provider<List<Product>>((ref) {
       category: 'Home',
       rating: 4.3,
     ),
-
-    // ========================================================================
-    // FITNESS
-    // ========================================================================
 
     Product(
       id: 'p8',
@@ -321,7 +305,6 @@ final productListProvider = Provider<List<Product>>((ref) {
   ];
 });
 
-/// All distinct categories, with "All" prepended.
 final categoryListProvider = Provider<List<String>>((ref) {
   final products = ref.watch(productListProvider);
 
