@@ -1,5 +1,6 @@
 import 'package:ecommerce_app/app_router.dart';
 import 'package:ecommerce_app/widgets/common/app_back_button.dart';
+import 'package:ecommerce_app/widgets/common/app_empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -13,23 +14,35 @@ class WishlistScreen extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final wishlist = ref.watch(wishlistProvider);
+    final colors = AppColors.of(context);
 
     return Scaffold(
-      backgroundColor: AppColors.of(context).bg,
+      backgroundColor: colors.bg,
       body: SafeArea(
         child: Column(
           children: [
+            // =============================================================
+            // HEADER
+            // =============================================================
             Padding(
-              padding: const EdgeInsets.fromLTRB(16, 10, 16, 14),
+              padding: const EdgeInsets.fromLTRB(
+                16,
+                10,
+                16,
+                14,
+              ),
               child: Row(
                 children: [
                   const AppBackButton(
                     overlay: true,
                   ),
+
                   const SizedBox(width: 12),
+
                   Text(
                     'Wishlist',
                     style: AppText.heading.copyWith(
+                      color: colors.ink,
                       fontSize: 18,
                       fontWeight: FontWeight.w800,
                     ),
@@ -37,16 +50,25 @@ class WishlistScreen extends ConsumerWidget {
                 ],
               ),
             ),
+
+            // =============================================================
+            // CONTENT
+            // =============================================================
             Expanded(
               child: wishlist.isEmpty
-                  ? Center(
-                      child: Text(
-                        'Your wishlist is empty',
-                        style: AppText.body.copyWith(color: AppColors.of(context).muted),
-                      ),
+                  ? const AppEmptyState(
+                      icon: Icons.favorite_border_rounded,
+                      title: 'Your wishlist is empty',
+                      message:
+                          'Products you love will appear here.',
                     )
                   : GridView.builder(
-                      padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
+                      padding: const EdgeInsets.fromLTRB(
+                        16,
+                        0,
+                        16,
+                        30,
+                      ),
                       gridDelegate:
                           const SliverGridDelegateWithFixedCrossAxisCount(
                         crossAxisCount: 2,
@@ -61,7 +83,7 @@ class WishlistScreen extends ConsumerWidget {
                         return ProductCard(
                           product: product,
                           onTap: () {
-                             Navigator.of(context).pushNamed(
+                            Navigator.of(context).pushNamed(
                               AppRoutes.productDetail,
                               arguments: product,
                             );

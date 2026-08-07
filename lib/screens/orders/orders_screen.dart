@@ -1,10 +1,12 @@
 import 'package:ecommerce_app/widgets/common/app_back_button.dart';
+import 'package:ecommerce_app/widgets/common/app_empty_state.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../theme.dart';
 import '../../models/order.dart';
 import '../../providers/order_provider.dart';
+import 'order_detail_screen.dart';
 
 class OrdersScreen extends ConsumerWidget {
   const OrdersScreen({super.key});
@@ -62,11 +64,11 @@ class OrdersScreen extends ConsumerWidget {
             ),
             Expanded(
               child: orders.isEmpty
-                  ? Center(
-                      child: Text(
-                        'No orders yet',
-                        style: AppText.body.copyWith(color: AppColors.of(context).muted),
-                      ),
+                  ? const AppEmptyState(
+                      icon: Icons.receipt_long_outlined,
+                      title: 'No orders yet',
+                      message:
+                          'Your orders will appear here after you make a purchase.',
                     )
                   : ListView.separated(
                       padding: const EdgeInsets.fromLTRB(16, 0, 16, 30),
@@ -75,74 +77,96 @@ class OrdersScreen extends ConsumerWidget {
                       itemBuilder: (context, index) {
                         final order = orders[index];
 
-                        return Container(
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(16),
-                            border: Border.all(
-                              color: Colors.black.withOpacity(0.035),
-                            ),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.045),
-                                blurRadius: 14,
-                                offset: const Offset(0, 6),
+                        return GestureDetector(
+                          onTap: () {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (_) => OrderDetailScreen(order: order),
                               ),
-                            ],
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    'Order #${order.id}',
-                                    style: AppText.body.copyWith(
-                                      fontWeight: FontWeight.w700,
-                                      fontSize: 13,
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: _statusColor(order.status)
-                                          .withOpacity(0.12),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Text(
-                                      _statusLabel(order.status),
-                                      style: AppText.label.copyWith(
-                                        color: _statusColor(order.status),
-                                        fontSize: 10,
+                            );
+                          },
+                          behavior: HitTestBehavior.opaque,
+                          child: Container(
+                            padding: const EdgeInsets.all(14),
+                            decoration: BoxDecoration(
+                              color: AppColors.of(context).surface,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(
+                                color:
+                                    AppColors.of(context).line.withOpacity(0.6),
+                              ),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.black.withOpacity(0.045),
+                                  blurRadius: 14,
+                                  offset: const Offset(0, 6),
+                                ),
+                              ],
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Order #${order.id}',
+                                      style: AppText.body.copyWith(
                                         fontWeight: FontWeight.w700,
+                                        fontSize: 13,
                                       ),
                                     ),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: _statusColor(order.status)
+                                            .withOpacity(0.12),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Text(
+                                        _statusLabel(order.status),
+                                        style: AppText.label.copyWith(
+                                          color: _statusColor(order.status),
+                                          fontSize: 10,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${order.items.length} item(s) • ${order.date.day}/${order.date.month}/${order.date.year}',
+                                  style: AppText.label.copyWith(
+                                    color: AppColors.of(context).muted,
+                                    fontSize: 11,
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                '${order.items.length} item(s) • ${order.date.day}/${order.date.month}/${order.date.year}',
-                                style: AppText.label.copyWith(
-                                  color: AppColors.of(context).muted,
-                                  fontSize: 11,
                                 ),
-                              ),
-                              const SizedBox(height: 8),
-                              Text(
-                                '\$${order.total.toStringAsFixed(2)}',
-                                style: AppText.body.copyWith(
-                                  fontWeight: FontWeight.w800,
-                                  fontSize: 14,
+                                const SizedBox(height: 8),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      '\$${order.total.toStringAsFixed(2)}',
+                                      style: AppText.body.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Icon(
+                                      Icons.chevron_right_rounded,
+                                      color: AppColors.of(context).muted,
+                                      size: 18,
+                                    ),
+                                  ],
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         );
                       },

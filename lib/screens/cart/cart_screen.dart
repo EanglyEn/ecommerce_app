@@ -3,7 +3,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../models/order.dart';
 import '../../providers/cart_provider.dart';
+import '../../providers/order_provider.dart';
 import '../../theme.dart';
 import '../../widgets/common/app_dialog.dart';
 import '../../widgets/common/app_snack_bar.dart';
@@ -158,6 +160,25 @@ class CartScreen extends ConsumerWidget {
     );
 
     if (!shouldCheckout) return;
+
+    final cartItems = ref.read(cartProvider);
+
+    final order = Order(
+      id: DateTime.now().millisecondsSinceEpoch.toString(),
+      date: DateTime.now(),
+      status: OrderStatus.processing,
+      items: cartItems
+          .map(
+            (item) => OrderItem(
+              product: item.product,
+              quantity: item.quantity,
+            ),
+          )
+          .toList(),
+      total: total,
+    );
+
+    ref.read(orderProvider.notifier).addOrder(order);
 
     ref.read(cartProvider.notifier).clearCart();
 

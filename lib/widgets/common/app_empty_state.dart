@@ -19,17 +19,22 @@ class AppEmptyState extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = AppColors.of(context);
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.all(32),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // =============================================================
+            // ICON
+            // =============================================================
             Container(
               width: 76,
               height: 76,
-              decoration: const BoxDecoration(
-                color: AppColors.softBrand,
+              decoration: BoxDecoration(
+                color: AppColors.brand.withOpacity(0.10),
                 shape: BoxShape.circle,
               ),
               child: Icon(
@@ -41,30 +46,44 @@ class AppEmptyState extends StatelessWidget {
 
             const SizedBox(height: 18),
 
+            // =============================================================
+            // TITLE
+            // =============================================================
             Text(
               title,
               textAlign: TextAlign.center,
               style: AppText.heading.copyWith(
                 fontSize: 19,
+                color: colors.ink,
               ),
             ),
 
+            // =============================================================
+            // MESSAGE
+            // =============================================================
             if (message != null) ...[
               const SizedBox(height: 6),
               Text(
                 message!,
                 textAlign: TextAlign.center,
                 style: AppText.body.copyWith(
-                  color: AppColors.of(context).muted,
+                  color: colors.muted,
                   fontSize: 13,
                 ),
               ),
             ],
 
+            // =============================================================
+            // BUTTON
+            // =============================================================
             if (buttonText != null) ...[
               const SizedBox(height: 20),
               ElevatedButton(
                 onPressed: onButtonPressed,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.brand,
+                  foregroundColor: Colors.white,
+                ),
                 child: Text(buttonText!),
               ),
             ],

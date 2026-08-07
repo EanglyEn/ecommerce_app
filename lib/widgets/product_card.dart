@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/product.dart';
 import '../providers/cart_provider.dart';
+import '../providers/wishlist_provider.dart';
 import '../theme.dart';
 
 class ProductCard extends ConsumerWidget {
@@ -29,6 +30,12 @@ class ProductCard extends ConsumerWidget {
 
     final bool isInCart = cartItem != null;
     final int quantity = isInCart ? cartItem.quantity : 0;
+
+    final bool isWishlisted = ref.watch(
+      wishlistProvider.select(
+        (wishlist) => wishlist.any((p) => p.id == product.id),
+      ),
+    );
 
     return GestureDetector(
       onTap: onTap,
@@ -161,6 +168,30 @@ class ProductCard extends ConsumerWidget {
                         ),
                       ),
                     ),
+                  Positioned(
+                    top: 12,
+                    right: 12,
+                    child: _PressableScale(
+                      onTap: () {
+                        ref.read(wishlistProvider.notifier).toggle(product);
+                      },
+                      child: Container(
+                        width: 30,
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.black.withOpacity(0.32),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          isWishlisted
+                              ? Icons.favorite_rounded
+                              : Icons.favorite_border_rounded,
+                          color: isWishlisted ? Colors.red : Colors.white,
+                          size: 16,
+                        ),
+                      ),
+                    ),
+                  ),
                   Positioned(
                     right: 12,
                     bottom: 12,
@@ -386,11 +417,11 @@ class _AddButton extends StatelessWidget {
         width: 32,
         height: 32,
         decoration: BoxDecoration(
-          color: AppColors.add,
+          color: AppColors.brand,
           shape: BoxShape.circle,
           boxShadow: [
             BoxShadow(
-              color: AppColors.add.withOpacity(0.35),
+              color: AppColors.brand.withOpacity(0.35),
               blurRadius: 6,
               offset: const Offset(0, 2),
             ),

@@ -9,6 +9,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../models/product.dart';
 import '../../providers/product_provider.dart';
+import '../../providers/wishlist_provider.dart';
 import '../../theme.dart';
 
 class ExploreScreen extends ConsumerStatefulWidget {
@@ -497,7 +498,7 @@ class _ProductInformation extends StatelessWidget {
   }
 }
 
-class _ExploreActions extends StatefulWidget {
+class _ExploreActions extends ConsumerWidget {
   final Product product;
   final VoidCallback onOpenProduct;
 
@@ -507,25 +508,22 @@ class _ExploreActions extends StatefulWidget {
   });
 
   @override
-  State<_ExploreActions> createState() => _ExploreActionsState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final liked = ref.watch(
+      wishlistProvider.select(
+        (wishlist) => wishlist.any((p) => p.id == product.id),
+      ),
+    );
 
-class _ExploreActionsState extends State<_ExploreActions> {
-  bool _liked = false;
-
-  @override
-  Widget build(BuildContext context) {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
         _ActionButton(
-          icon: _liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
+          icon: liked ? Icons.favorite_rounded : Icons.favorite_border_rounded,
           label: 'Like',
-          active: _liked,
+          active: liked,
           onTap: () {
-            setState(() {
-              _liked = !_liked;
-            });
+            ref.read(wishlistProvider.notifier).toggle(product);
           },
         ),
         const SizedBox(height: 15),
@@ -534,11 +532,11 @@ class _ExploreActionsState extends State<_ExploreActions> {
           label: 'Share',
           onTap: () {
             AppShare.imageWithDetails(
-              imageUrl: widget.product.imageUrl,
-              title: widget.product.name,
-              description: widget.product.description,
-              subject: widget.product.name,
-              fileName: '${widget.product.id}.jpg',
+              imageUrl: product.imageUrl,
+              title: product.name,
+              description: product.description,
+              subject: product.name,
+              fileName: '${product.id}.jpg',
             );
           },
         ),
@@ -546,7 +544,7 @@ class _ExploreActionsState extends State<_ExploreActions> {
         _ActionButton(
           icon: Icons.shopping_bag_rounded,
           label: 'Shop',
-          onTap: widget.onOpenProduct,
+          onTap: onOpenProduct,
         ),
       ],
     );
